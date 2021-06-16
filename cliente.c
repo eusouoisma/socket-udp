@@ -174,8 +174,7 @@ int main()
 	struct sockaddr_in servaddr;
 
 	// Creating socket file descriptor
-	if ((sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
-	{
+	if ((sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0){
 		perror("socket creation failed");
 		exit(EXIT_FAILURE);
 	}
@@ -200,8 +199,7 @@ int main()
 
 	char json[10000];
 
-	switch (action)
-	{
+	switch (action){
 	case 1:
 		newUser(json);
 		break;
@@ -227,6 +225,9 @@ int main()
 		delete(json);
 		break;
 	default:
+		printf("Opção inválida.\n");
+		close(sockfd);
+		return 0;
 		break;
 	}
 
