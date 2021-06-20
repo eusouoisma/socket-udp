@@ -30,7 +30,7 @@ int main() {
     struct json_object *option;
     struct json_object *json_field;
 
-    // Creating socket file descriptor
+    // Cria o socket
     if ( (sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0 ) {
         perror("socket creation failed");
         exit(EXIT_FAILURE);
@@ -39,12 +39,12 @@ int main() {
     memset(&servaddr, 0, sizeof(servaddr));
     memset(&cliaddr, 0, sizeof(cliaddr));
       
-    // Filling server information
+    // Preenche as informaç~eos do servidor
     servaddr.sin_family    = AF_INET; // IPv4
     servaddr.sin_addr.s_addr = INADDR_ANY;
     servaddr.sin_port = htons(PORT);
       
-    // Bind the socket with the server address
+    // Vincula o endereço do servidor ao socket
     if ( bind(sockfd, (const struct sockaddr *)&servaddr, sizeof(servaddr)) < 0 ){
         perror("bind failed");
         exit(EXIT_FAILURE);
@@ -52,25 +52,30 @@ int main() {
       
     int len, n;
   
-    len = sizeof(cliaddr);  //len is value/resuslt
+    len = sizeof(cliaddr);
 
+    // loop para manter o servidor ativo
     while (1){
+        // recebe os dados do cliente
         n = recvfrom(sockfd, (char *)buffer, MAXLINE, 
                 MSG_WAITALL, ( struct sockaddr *) &cliaddr,
                 &len);
         buffer[n] = '\0';
 
         printf("JSON recebido: %s\n", buffer);
-        
+
+        // converte o que foi recebido para JSON        
         parsed_json = json_tokener_parse(buffer);
-
+        
+        // verifica qual opção do menu foi selecionada pelo cliente
         json_object_object_get_ex(parsed_json, "option", &option);
-
         switch (json_object_get_int(option)){
             case 1:
+                // Opção 1 - cadastro de um novo usuário
+                // verifica se o email não está cadastrado e cria o novo perfil
                 json_object_object_get_ex(parsed_json, "email", &json_field);
                 strcpy(email, (char *) json_object_get_string(json_field));
-                
+
                 if (checkEmail(email)>0){
                     strcpy(return_message, "\nErro: Email já cadastrado.");
                 }else{
@@ -101,6 +106,8 @@ int main() {
                 }
                 break;
             case 2:
+                // Opção 2 - Adiciona experiência a um perfil
+                // verifica se o perfil é válido (email cadastrado) e atualiza o cadastro
                 json_object_object_get_ex(parsed_json, "email", &json_field);
                 strcpy(email, (char *) json_object_get_string(json_field));
                 
@@ -114,6 +121,7 @@ int main() {
                 }
                 break;
             case 3:
+                // Opção 3 - Busca por curso
                 json_object_object_get_ex(parsed_json, "course", &json_field);
                 strcpy(course, (char *) json_object_get_string(json_field));
 
@@ -121,6 +129,7 @@ int main() {
 
                 break;
             case 4:
+                // Opção 4 - Busca por habilidade
                 json_object_object_get_ex(parsed_json, "hability", &json_field);
                 strcpy(hability, (char *) json_object_get_string(json_field));
 
@@ -128,6 +137,7 @@ int main() {
 
                 break;
             case 5:
+                // Opção 5 - Busca por ano de graduação
                 json_object_object_get_ex(parsed_json, "graduationYear", &json_field);
                 strcpy(graduationYear, (char *) json_object_get_string(json_field));
 
@@ -135,6 +145,7 @@ int main() {
 
                 break;
             case 6:
+                // Opção 6 - Busca por email
                 json_object_object_get_ex(parsed_json, "email", &json_field);
                 strcpy(email, (char *) json_object_get_string(json_field));
 
@@ -142,9 +153,12 @@ int main() {
 
                 break;
             case 7:
+                // Opção 7 - lista todos os usuários
                 strcpy(return_message, listAll());
                 break;
             case 8:
+                // Opção 7 - reove um usuário
+                // verifica se o usuário existe
                 json_object_object_get_ex(parsed_json, "email", &json_field);
                 strcpy(email, (char *) json_object_get_string(json_field));
                 
@@ -158,6 +172,7 @@ int main() {
                 strcpy(return_message, "\nErro: Opção inválida.");
         }
 
+        // retorna para o cliente uma mensagem informando o resultado da operação solicitada
         sendto(sockfd, &return_message, strlen(return_message), MSG_CONFIRM, (const struct sockaddr *) &cliaddr, len);
     }
 
