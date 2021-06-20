@@ -220,31 +220,30 @@ void delete (char *json)
 
 int main()
 {
-	int sockfd;
-	char buffer[MAXLINE];
-	struct sockaddr_in servaddr;
-
-	/* Cria um socket */
-	if ((sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
-	{
-		perror("Erro na criação do socket");
-		exit(EXIT_FAILURE);
-	}
-
-	memset(&servaddr, 0, sizeof(servaddr));
-
-	// Guarda as informações do servidor
-	servaddr.sin_family = AF_INET;
-	servaddr.sin_port = htons(PORT);
-	servaddr.sin_addr.s_addr = INADDR_ANY;
-
-	int n, len;
-
 	int action = -1;
 	
 	/* Mantém a execução ativa até que o usuário decida sair */
 	while (action != 0)
 	{
+		int sockfd;
+		char buffer[MAXLINE];
+		struct sockaddr_in servaddr;
+
+		/* Cria um socket */
+		if ((sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
+		{
+			perror("Erro na criação do socket");
+			exit(EXIT_FAILURE);
+		}
+
+		memset(&servaddr, 0, sizeof(servaddr));
+
+		// Guarda as informações do servidor
+		servaddr.sin_family = AF_INET;
+		servaddr.sin_port = htons(PORT);
+		servaddr.sin_addr.s_addr = INADDR_ANY;
+
+		int n, len;
 
 		/* Exibe as opções ao usuário */
 		char menu[] = "\nOlá! Escolha uma opção abaixo: \n\n1-Cadastrar novo perfil\n2-Adicionar experiência profissional\n3-Busca por curso\n4-Busca por habilidade\n5-Busca por ano de formação\n6-Busca por email\n7-Listar todos perfis\n8-Apagar perfil\n0-Sair\nOpção: ";
@@ -258,7 +257,7 @@ int main()
 		while ((c = getchar()) != '\n' && c != EOF){}
 
 		/* String que será usada para guardar um json que será enviado para o servidor */
-		char json[10000];
+		char json[10000] = "";
 
 		/* Chama uma determinada função de acordo com a solicitação do usuário */
 		switch (action){
