@@ -39,7 +39,7 @@ int main() {
     memset(&servaddr, 0, sizeof(servaddr));
     memset(&cliaddr, 0, sizeof(cliaddr));
       
-    // Preenche as informaç~eos do servidor
+    // Preenche as informações do servidor
     servaddr.sin_family    = AF_INET; // IPv4
     servaddr.sin_addr.s_addr = INADDR_ANY;
     servaddr.sin_port = htons(PORT);
